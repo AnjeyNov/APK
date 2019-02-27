@@ -9,31 +9,46 @@
 
 void main(int argc, char * argv[])
 {
-	long double a = 1, b = 1000, step = 0.0001, x, f;
+	long double a = 0, b = 0, step = 0, x, f;
 	int one = 1;
-	int nine = 9;
 	double t;
 	LARGE_INTEGER timerFrequency, timerStart, timerStop;
+	while (true) {
+		printf("Input 'a': ");						
+		scanf("%lf", &a);										// считываем переменную а - начало интервала
+		printf("\nInput 'b': ");
+		scanf("%lf", &b);										// считываем переменную b - конец интервала
+		printf("\nInput 'step': ");				
+		scanf("%lf", &step);									// считываем переменную step - шаг увеличения
+		if (a >= b)
+			printf("\nYou are stupid! ");						// если конец интервала меньше чем начало, то пользователь
+																// слегка глупый
+		else
+			break;
+	}
 
 	x = a;
 	f = 0;
-	QueryPerformanceFrequency(&timerFrequency);
-	QueryPerformanceCounter(&timerStart);
+	QueryPerformanceFrequency(&timerFrequency);					// получение частоты счетчика в переменную timerFrequency
+	QueryPerformanceCounter(&timerStart);						// получение занчения счетчика на момент старта в 
+																// переменную timerStart
 	while(x <= b)
 	{
-	f += sin(cos(sqrt(x) + 1));/* / sqrt(2 * x)*/
+	f += sin(cos(sqrt(x) + 1));
 	x += step;
 	};
-	QueryPerformanceCounter(&timerStop);
+	QueryPerformanceCounter(&timerStop);						// получение занчения счетчика на момент старта в 
+																// переменную timerStop
 	t = (double)(timerStop.QuadPart - timerStart.QuadPart) / (double)timerFrequency.QuadPart;
-	printf("Time C is %lf seconds.\n", t);
+																// вычисление прошедшего времени
+	printf("\nTime C is %lf seconds.\n", t);
 	printf("%lf\n", f);
 
 
 	x = a;
-	f = 0;
-	QueryPerformanceFrequency(&timerFrequency);
-	QueryPerformanceCounter(&timerStart);
+	f = 0;				
+	QueryPerformanceCounter(&timerStart);				// получение занчения счетчика на момент старта в 
+														// переменную timerStart
 	_asm {
 		finit											//инициализация мат сопроцессора
 
@@ -87,8 +102,10 @@ void main(int argc, char * argv[])
 	loop_end :
 		fwait											// ожидает завершение команд FPU
 	}
-	QueryPerformanceCounter(&timerStop);
+	QueryPerformanceCounter(&timerStop);				// получение занчения счетчика на момент старта в 
+														// переменную timerStop
 	t = ((double)timerStop.QuadPart - timerStart.QuadPart) / (double)timerFrequency.QuadPart;
+														// вычисление прошедшего времени
 	printf("Time ASM is %lf seconds.\n", t);
 	printf("%lf\n", f);
 
