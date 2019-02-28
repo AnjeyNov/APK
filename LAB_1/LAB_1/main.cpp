@@ -20,7 +20,7 @@ void main(int argc, char * argv[])
 		scanf("%lf", &b);										// считываем переменную b - конец интервала
 		printf("\nInput 'step': ");				
 		scanf("%lf", &step);									// считываем переменную step - шаг увеличения
-		if (a >= b)
+		if (a >= b)	
 			printf("\nYou are stupid! ");						// если конец интервала меньше чем начало, то пользователь
 																// слегка глупый
 		else
@@ -34,10 +34,10 @@ void main(int argc, char * argv[])
 																// переменную timerStart
 	while(x <= b)
 	{
-	f += sin(cos(sqrt(x) + 1));
-	x += step;
+		f += sin(cos(sqrt(x) + 1));
+		x += step;
 	};
-	QueryPerformanceCounter(&timerStop);						// получение занчения счетчика на момент старта в 
+	QueryPerformanceCounter(&timerStop);						// получение занчения счетчика на момент остановки в 
 																// переменную timerStop
 	t = (double)(timerStop.QuadPart - timerStart.QuadPart) / (double)timerFrequency.QuadPart;
 																// вычисление прошедшего времени
@@ -59,7 +59,7 @@ void main(int argc, char * argv[])
 
 		loop_start :
 		fcom											// сравниваем ST(0) и ST(1)  (x и b)
-			fstsw ax									// регистр SR -> AX
+			fstsw ax									// регистр SW -> AX
 			and ah, 01000101b							// if(x>b)[C3=1, C2 = 1, C1 =1] loop_end
 			jz loop_end
 
@@ -87,7 +87,7 @@ void main(int argc, char * argv[])
 														// ST(1) = x
 														// ST(2) = b
 
-			fstp f										// F = (sin(x+1) / cos(x) + 2) + f
+			fstp f										// F = sin(cos(sqrt(x)+1)) + f
 														// ST(0) = x
 														// ST(1) = b
 
