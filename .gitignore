@@ -7,5 +7,5 @@
 /LAB_2/LAB_2/Debug
 /LAB_1/.vs/LAB_1/v15
 /LAB_1/LAB_1/Debug
-/LAB_1/LAB_1/x64/Debug/LAB_1.tlog
+*.tlog
 /LAB_1/LAB_1/x64/Debug

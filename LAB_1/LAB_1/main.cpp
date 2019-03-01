@@ -59,7 +59,7 @@ void main(int argc, char * argv[])
 		loop_start :
 		fcom											// сравниваем ST(0) и ST(1)  (x и b)
 			fstsw ax									// регистр SW -> AX
-			and ah, 01000101b							// if(x>b)[C3=1, C2 = 1, C1 =1] loop_end
+			and ah, 01000101b							// if(x>b)[C3=0, C2 = 0, C1 =0] loop_end
 			jz loop_end
 
 			fld x										//ST(0) = x
