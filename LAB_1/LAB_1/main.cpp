@@ -4,7 +4,6 @@
 #include <math.h>
 #include <time.h>
 #include <conio.h>
-
 #include <windows.h>
 
 void main(int argc, char * argv[])
@@ -111,4 +110,5 @@ void main(int argc, char * argv[])
 
 
 	_getch();
+	return;
 }
