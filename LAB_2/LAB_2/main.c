@@ -119,12 +119,11 @@ void andASM(void)
 
 void andMMX(void)
 {
-	//double t;
-	//clock_t start, end;
-	//LARGE_INTEGER timerFrequency, timerStart, timerStop;
-	//QueryPerformanceFrequency(&timerFrequency);
-	//QueryPerformanceCounter(&timerStart);
-	//start = clock();
+	double t;
+	LARGE_INTEGER timerFrequency, timerStart, timerStop;
+	QueryPerformanceFrequency(&timerFrequency);
+	QueryPerformanceCounter(&timerStart);
+
 	_asm {
 		pusha									// сохранить в стэк все регистры
 
@@ -139,7 +138,7 @@ void andMMX(void)
 			xor ESI, ESI						//		ESI = 0
 			loop1 :								//		for(; ECX > 0; ECX--){
 				push ECX						//			загрузить ECX в стек
-				mov ECX, 08h					//			ECX = 8
+				mov ECX, 02h					//			ECX = 8
 				xor EDI, EDI					//			EDI = 0
 				loop2 :							//			for(; ECX > 0; ECX--){
 					movd MM0, A[ESI][EDI]		//				MM0 = { A[ESI][EDI], A[ESI][EDI+2], A[ESI][EDI+4], A[ESI][EDI+6] }
@@ -154,13 +153,13 @@ void andMMX(void)
 			pop ECX								//		выгрузить ECX из стека
 		loop loop0								// }
 		popa									// выгрузить все регистры из стека
+		EMMS
 	}
 
-	//end = clock();
-	//QueryPerformanceCounter(&timerStop);
+	QueryPerformanceCounter(&timerStop);
 
-	//t = (double)(timerStop.QuadPart - timerStart.QuadPart) / (double)timerFrequency.QuadPart;
-	//printf("\nTime .asm with MMX is %lf seconds.\n", t);
+	t = (double)(timerStop.QuadPart - timerStart.QuadPart) / (double)timerFrequency.QuadPart;
+	printf("\nTime .asm with MMX is %lf seconds.\n", t);
 	outMatrix();								// вывод результата
 	return;
 }
