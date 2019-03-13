@@ -10,8 +10,7 @@
 #include <conio.h>
 #include <windows.h>
 
-short C[8][8], A[8][8], B[8][8];
-
+short A[64], B[64], C[64];
 
 void andC(void);												// логическое И для двух матриц на языке Си
 
@@ -21,16 +20,14 @@ void andASM(void);												// логическое И для двух матриц на языке ассемблер
 void andMMX(void);												// логическое И для дву матриц на языке ассемблер
 																// с использованием набора команд MMX
 
-void outMatrix(void);											// вывод результата
+void outMatrix(short *C);											// вывод результата
 
 int main(int argc, char *argv[]) {
 	
 	// инициализация двух матриц
-	for (int i = 0; i < 8; i++) {
-		for (int j = 0; j < 8; j++) {
-			A[i][j] = (i + j) * 2;
-			B[i][j] = (i*j) + 2;
-		}
+	for (int i = 0; i < 64; i++) {
+		A[i] = (i/3) * 2;
+		B[i] = (i*3) + 2;
 	}
 
 	// выполнение
@@ -47,15 +44,14 @@ void andC(void)
 {
 	double t;
 	LARGE_INTEGER timerFrequency, timerStart, timerStop;
+	//short C[8][8];
 	QueryPerformanceFrequency(&timerFrequency);					
 	QueryPerformanceCounter(&timerStart);
 
 	// выполняем логическое И для соответствующих элементов и заносим резальтат в матрицу С
 	for (double k = 0; k < 10000000; k++) {
-		for (int i = 0; i < 8; i++) {
-			for (int j = 0; j < 8; j++) {
-				C[i][j] = A[i][j] & B[i][j];
-			}
+		for (int i = 0; i < 64; i++) {
+			C[i] = A[i] & B[i];
 		}
 	}
 
@@ -66,7 +62,7 @@ void andC(void)
 	printf("\nTime C is %lf seconds.\n", t);
 	
 	// вывод результата
-	outMatrix();					
+	outMatrix(C);					
 	return;
 }
 
@@ -87,21 +83,18 @@ void andASM(void)
 		loop0:									// for(; ECX > 0; ECX--){
 			push ECX							//		загрузить регистр ECX в стек	
 			mov ECX, 08h						//		ECX = 8
-			xor ESI, ESI						//		EXI = 0
+			xor EDI, EDI
 			loop1:								//		for(; ECX > 0; ECX--){
 				push ECX						//			загрузать регистр ECX в стек
 				mov ECX, 08h					//			ECX = 8
-				xor EDI, EDI					//			EDI = 0
 				loop2:							//			for(; ECX > 0; ECX--){
-					mov AX, A[ESI][EDI]			//				AX = A[ESI][EDI]
-					and AX, B[ESI][EDI]			//				AX = AX & B[ESI][EDI] 
-					mov C[ESI][EDI], AX			//				C[ESI][EDI] = AX
+					mov AX, A[EDI]				//				AX = A[EDI]
+					and AX, B[EDI]				//				AX = AX & B[EDI] 
+					mov C[EDI], AX				//				C[EDI] = AX
 					inc EDI						//				EDI++
 					inc EDI						//				EDI++
 				loop loop2						//			}
-				inc ESI							//			ESI++
-				inc ESI							//			ESI++
-				pop ECX							//			выгрузить ECX из стека
+					pop ECX						//			выгрузить ECX из стека
 			loop loop1							//		}
 		pop ECX									// выгрузить ECX из стека
 		loop loop0								// }
@@ -113,7 +106,7 @@ void andASM(void)
 	t = (double)(timerStop.QuadPart - timerStart.QuadPart) / (double)timerFrequency.QuadPart;
 	printf("\nTime .asm is %lf seconds.\n", t);
 
-	outMatrix();
+	outMatrix(C);
 	return;
 }
 
@@ -135,19 +128,16 @@ void andMMX(void)
 		loop0 :									// for(; ECX > 0; ECX--){
 			push ECX							//		загрузить ECX в стек
 			mov ECX, 08h						//		ECX = 8
-			xor ESI, ESI						//		ESI = 0
+			xor EDI, EDI						//			EDI = 0
 			loop1 :								//		for(; ECX > 0; ECX--){
 				push ECX						//			загрузить ECX в стек
 				mov ECX, 02h					//			ECX = 8
-				xor EDI, EDI					//			EDI = 0
 				loop2 :							//			for(; ECX > 0; ECX--){
-					movd MM0, A[ESI][EDI]		//				MM0 = { A[ESI][EDI], A[ESI][EDI+2], A[ESI][EDI+4], A[ESI][EDI+6] }
-					pand MM0, B[ESI][EDI]		//				MM0 & { B[ESI][EDI], B[ESI][EDI+2], B[ESI][EDI+4], B[ESI][EDI+6] }
-					movd C[ESI][EDI], MM0		//				{ C[ESI][EDI], C[ESI][EDI+2], C[ESI][EDI+4], C[ESI][EDI+6] } = MM0
+					movq MM0, A[EDI]			//				MM0 = { A[EDI], A[EDI+2], A[EDI+4], A[EDI+6] }
+					pand MM0, B[EDI]			//				MM0 & { B[EDI], B[EDI+2], B[EDI+4], B[EDI+6] }
+					movq C[EDI], MM0			//				{ C[EDI], C[EDI+2], C[EDI+4], C[EDI+6] } = MM0
 					add EDI, 08h				//				EDI +=8
 				loop loop2						//			}
-				inc ESI							//			ESI++
-				inc ESI							//			ESI++
 				pop ECX							//			выгрузить ECX из стека
 			loop loop1							//		}
 			pop ECX								//		выгрузить ECX из стека
@@ -160,17 +150,18 @@ void andMMX(void)
 
 	t = (double)(timerStop.QuadPart - timerStart.QuadPart) / (double)timerFrequency.QuadPart;
 	printf("\nTime .asm with MMX is %lf seconds.\n", t);
-	outMatrix();								// вывод результата
+	outMatrix(C);								// вывод результата
 	return;
 }
 
-void outMatrix(void)
+void outMatrix(short *C)
 {
-	for (int i = 0; i < 8; i++) {
-		for (int j = 0; j < 8; j++) {
-			printf("%2hd ", C[i][j]);
+	for (int i = 0; i < 64; i++) {
+		if (i % 8 == 0) {
+			printf("\n");
 		}
-		printf("\n");
+		printf("%2hd ", C[i]);
+		C[i] = 0;
 	}
 	printf("\n");
 }
