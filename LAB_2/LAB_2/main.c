@@ -21,8 +21,8 @@ void outMatrix(short *C);										// out result
 int main(int argc, char *argv[]) {
 	
 	for (int i = 0; i < 64; i++) {
-		A[i] = (i/3) * 2;
-		B[i] = (i*3) + 2;
+		A[i] = (rand()%60000+1)/2;
+		B[i] = (rand()%30000+1) * 2;
 	}
 
 	andC();
@@ -139,7 +139,7 @@ void outMatrix(short *C)
 		if (i % 8 == 0) {
 			printf("\n");
 		}
-		printf("%2hd ", C[i]);
+		printf("%5.1hd ", C[i]);
 		C[i] = 0;
 	}
 	printf("\n");
