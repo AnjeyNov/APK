@@ -45,12 +45,12 @@ void generateSound(int frequency, int d)
 
 	outp(0x43, 0xB6);		// 10 11 011 0
 							// write to control register of the system timer 
-							// (set square wave generation in port 2)
+							// (set square wave generation in channel 3)
 
 	frequencyDivider = TimerFrequensy / frequency;
-	outp(0x42, frequencyDivider % 256);			// younger half to port 3
+	outp(0x42, frequencyDivider % 256);			// younger half to channel 3
 	frequencyDivider /= 256;
-	outp(0x42, frequencyDivider);				// senior half to port 3
+	outp(0x42, frequencyDivider);				// senior half to channel 3
 
 	outp(0x61, inp(0x61) | 3);					// get value of speaker port, set 0 and 1 bit
 												// in 1 and set valuse in speaker port
@@ -99,7 +99,7 @@ void strcan()
 void getRandomValue(long val)
 {
 	long Low, High, Full, maxVal;
-	outp(0x43, 0xB4); // 10 11 010 0    set 2 channel, write younger half and senior half
+	outp(0x43, 0xB4); // 10 11 010 0    set 3 channel, write younger half and senior half
 									  //pulse generation, 16-bit mode
 	
 	maxVal = TimerFrequensy / val;
@@ -112,7 +112,7 @@ void getRandomValue(long val)
 	{
 		i++;
 		delay(i);
-		outp(0x43, 0x86); // 1000 0110
+		outp(0x43, 0x86); // 10 00 0000
 		Low = inp(0x42);
 		High = inp(0x42);
 		Full = High * 256 + Low;
