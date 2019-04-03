@@ -26,14 +26,14 @@ void interrupt(*intF) (...);
 
 
 // указатели на старые обработчики прерываний на SLAVE
-void interrupt(*int88) (...);
-void interrupt(*int89) (...);
-void interrupt(*int8A) (...);
-void interrupt(*int8B) (...);
-void interrupt(*int8C) (...);
-void interrupt(*int8D) (...);
-void interrupt(*int8E) (...);
-void interrupt(*int8F) (...);
+void interrupt(*int70) (...);
+void interrupt(*int71) (...);
+void interrupt(*int72) (...);
+void interrupt(*int73) (...);
+void interrupt(*int74) (...);
+void interrupt(*int75) (...);
+void interrupt(*int76) (...);
+void interrupt(*int77) (...);
 
 
 // новые обработчики прерываний на MASTER
@@ -47,14 +47,14 @@ void interrupt  newE(...) { get_reg(); intE(); }
 void interrupt  newF(...) { get_reg(); intF(); }
 
 // новыие обработчики прерываний на SLAVE
-void interrupt  new88(...) { get_reg(); int88(); }
-void interrupt  new89(...) { get_reg(); int89(); }
-void interrupt  new8A(...) { get_reg(); int8A(); }
-void interrupt  new8B(...) { get_reg(); int8B(); }
-void interrupt  new8C(...) { color++; get_reg(); int8C(); }		// обработчик мыши
-void interrupt  new8D(...) { get_reg(); int8D(); }
-void interrupt  new8E(...) { get_reg(); int8E(); }
-void interrupt  new8F(...) { get_reg(); int8F(); }
+void interrupt  newB8(...) { get_reg(); int70(); }
+void interrupt  newB9(...) { get_reg(); int71(); }
+void interrupt  newBA(...) { get_reg(); int72(); }
+void interrupt  newBB(...) { get_reg(); int73(); }
+void interrupt  newBC(...) { color++; get_reg(); int74(); }		// обработчик мыши
+void interrupt  newBD(...) { get_reg(); int75(); }
+void interrupt  newBE(...) { get_reg(); int76(); }
+void interrupt  newBF(...) { get_reg(); int77(); }
 
 
 void print(int val, int y, int x)
@@ -168,14 +168,14 @@ void init() {
 	intF = getvect(0x0F);
 
 	// получаем вектора прерываний SLAVE
-	int88 = getvect(0x70);
-	int89 = getvect(0x71);
-	int8A = getvect(0x72);
-	int8B = getvect(0x73);
-	int8C = getvect(0x74);
-	int8D = getvect(0x75);
-	int8E = getvect(0x76);
-	int8F = getvect(0x77);
+	int70 = getvect(0x70);
+	int71 = getvect(0x71);
+	int72 = getvect(0x72);
+	int73 = getvect(0x73);
+	int74 = getvect(0x74);
+	int75 = getvect(0x75);
+	int76 = getvect(0x76);
+	int77 = getvect(0x77);
 
 	// устанавливаем вектора прерываний MASTER
 	setvect(0x08, new8);
@@ -188,14 +188,14 @@ void init() {
 	setvect(0x0F, newF);
 
 	// устанавливаем вектора прерываний SLAVE
-	setvect(0x88, new88);
-	setvect(0x89, new89);
-	setvect(0x8A, new8A);
-	setvect(0x8B, new8B);
-	setvect(0x8C, new8C);
-	setvect(0x8D, new8D);
-	setvect(0x8E, new8E);
-	setvect(0x8F, new8F);
+	setvect(0xB8, newB8);
+	setvect(0xB9, newB9);
+	setvect(0xBA, newBA);
+	setvect(0xBB, newBB);
+	setvect(0xBC, newBC);
+	setvect(0xBD, newBD);
+	setvect(0xBE, newBE);
+	setvect(0xBF, newBF);
 
 	_disable();				// запрещаем прерывания
 
@@ -208,7 +208,7 @@ void init() {
 	
 	// slave
 	outp(0xA0, 0x11);		// 0001001 ICW1
-	outp(0xA1, 0x88);		// ICW2
+	outp(0xA1, 0xB8);		// ICW2
 	outp(0xA1, 0x02);		// ICW3
 	outp(0xA1, 0x01);		// ICW4
 

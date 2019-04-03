@@ -5,8 +5,14 @@
 
 #define TimerFrequensy  1193180
 
-int frequencyArray[9] = { 293,392,293,392,523,659,880,784,698 };
-int delayArray[9] = { 200,400,200,400,200,200,400,200,200 };
+int frequencyArray[16] = { 440,261,293,293,
+						  293,329,349,349,
+						  349,392,329,329,
+						  293,261,261,293};
+int delayArray[16] = { 200,200,200,400,
+					  200,200,200,400,
+					  200,200,200,400,
+					  200,200,200,400};
 
 void generateSound(int frequency, int d);
 void print(int state);
@@ -18,12 +24,11 @@ int main()
 {
 	int maximum;
 
-	for (int i = 0; i < 5; i++) {
-		for (int j = 0; j < 9; j++) {
-			generateSound(frequencyArray[j], delayArray[j]);
-		}
-		delay(100);
+	
+	for (int j = 0; j < 16; j++) {
+		generateSound(frequencyArray[j], delayArray[j]);
 	}
+	delay(100);
 
 	strcan();
 
@@ -90,6 +95,7 @@ void strcan()
 	printf("Channel 2: ");
 	print(state);
 
+	//outp(0x61, inp(0x61) | 1);
 	outp(0x43, 0xE8); //11 1 0 100 0	//3 channel
 	state = inp(0x42);					//read from 3 channel
 	printf("Channel 3: ");
@@ -98,21 +104,20 @@ void strcan()
 
 void getRandomValue(long val)
 {
-	long Low, High, Full, maxVal;
+	long Low, High, Full;
 	outp(0x43, 0xB4); // 10 11 010 0    set 3 channel, write younger half and senior half
 									  //pulse generation, 16-bit mode
 	
-	maxVal = TimerFrequensy / val;
-	outp(0x42, maxVal % 256);
-	maxVal /= 256;
-	outp(0x42, maxVal);
+	outp(0x42, val % 256);
+	val /= 256;
+	outp(0x42, val);
 	outp(0x61, inp(0x61) | 0x01);	// activ system timer
 	int i = 0;
 	while (i < 10)
 	{
 		i++;
 		delay(i);
-		outp(0x43, 0x86); // 10 00 0000
+		outp(0x43, 0x86); // 10 00 0000 channel 3 get value
 		Low = inp(0x42);
 		High = inp(0x42);
 		Full = High * 256 + Low;
@@ -129,7 +134,7 @@ void kdcan()
 
 	for (long i = 0; i < 65535; i++)
 	{
-		outp(0x43, 0x00); //0000 0000
+		outp(0x43, 0x00); //00 00 0000   channel 1 get value
 		kdLow = inp(0x40);
 		kdHigh = inp(0x40);
 		kd = kdHigh * 256 + kdLow;
@@ -139,7 +144,7 @@ void kdcan()
 	kdMax = 0;
 	for (i = 0; i < 65535; i++)
 	{
-		outp(0x43, 0x40); // 0100 0000
+		outp(0x43, 0x40); // 01 00 0000		channel 2 get value
 		kdLow = inp(0x41);
 		kdHigh = inp(0x41);
 		kd = kdHigh * 256 + kdLow;
@@ -149,7 +154,7 @@ void kdcan()
 	kdMax = 0;
 	for (i = 0; i < 65535; i++)
 	{
-		outp(0x43, 0x80); //1000 0000
+		outp(0x43, 0x80); //10 00 0000		channel 3 get value
 		kdLow = inp(0x42);
 		kdHigh = inp(0x42);
 		kd = kdHigh * 256 + kdLow;
